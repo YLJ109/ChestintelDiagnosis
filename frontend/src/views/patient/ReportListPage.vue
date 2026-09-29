@@ -283,6 +283,7 @@ import {
 } from '@element-plus/icons-vue'
 import { getPatientReportsApi, getPatientReportDetailApi } from '@/api/patient-portal'
 import { useAuthStore } from '@/stores/auth'
+import { sanitizeHtml } from '@/utils/xss'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -410,7 +411,7 @@ function getTopDisease(probabilities: any[]): string {
 
 function formatReport(report: any): string {
     const content = report.final_content || report.doctor_edited_content || report.ai_generated_content || ''
-    return content.replace(/\n/g, '<br>').replace(/#{1,3}\s(.+)/g, '<strong>$1</strong>')
+    return sanitizeHtml(content.replace(/\n/g, '<br>').replace(/#{1,3}\s(.+)/g, '<strong>$1</strong>'))
 }
 
 function getProgressColor(prob: number): string {

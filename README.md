@@ -1,15 +1,15 @@
 <div align="center">
 
-# 胸影智诊 V3.0
+# ChestintelDiagnosis
 
-**AIX-Ray Intelligent Diagnosis System**
+**胸影智诊 · 胸部 X 光 AI 智能辅助诊断系统**
 
 [![Vue 3](https://img.shields.io/badge/Vue-3.5-42b883?logo=vue.js)](https://vuejs.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.0-000000?logo=flask)](https://flask.palletsprojects.com/)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776ab?logo=python)](https://python.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178c6?logo=typescript)](https://typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/YLJ109/ChestAI-Diagnosis-V3.0?style=social)](https://github.com/YLJ109/ChestAI-Diagnosis-V3.0)
+[![GitHub stars](https://img.shields.io/github/stars/YLJ109/ChestintelDiagnosis?style=social)](https://github.com/YLJ109/ChestintelDiagnosis)
 
 **胸部 X 光 AI 智能辅助诊断系统** — 基于 DenseNet-121 + ONNX 加速推理 + 大语言模型的全栈医学影像 AI 平台
 
@@ -24,7 +24,7 @@
 ## 目录
 
 - [项目简介](#项目简介)
-- [版本演进](#版本演进)
+- [功能演进](#功能演进)
 - [功能特性](#功能特性)
 - [系统截图](#系统截图)
 - [技术架构](#技术架构)
@@ -44,9 +44,19 @@
 
 ---
 
+## About
+
+**ChestintelDiagnosis（胸影智诊）** 是一套面向医疗机构与基层卫生院的全栈 **AI 辅助胸部 X 光影像诊断平台**。基于 **DenseNet-121 (CheXNet)** 深度学习模型，对 **14 种胸部疾病** 进行多标签概率预测，叠加 Grad-CAM 热力图可视化，并结合大语言模型（LLM）一键生成专业放射学诊断报告。
+
+- **架构**：Vue 3 + TypeScript 前端 / Flask 后端 / SQLite 存储，支持纯 CPU 推理部署
+- **多端**：业务端（医护）、患者门户、管理端（权重 / LLM / 审计 / 系统）
+- **开箱即用**：内置模型权重与示例数据，三步启动
+
+> 中文名"胸影智诊"，英文项目名 **ChestintelDiagnosis**。
+
 ## 项目简介
 
-胸影智诊 V3.0 是一套面向医疗机构的全栈 **AI 辅助胸部 X 光影像诊断平台**。系统基于 **DenseNet-121 (CheXNet)** 深度学习模型，支持对 **14 种胸部疾病** 进行多标签概率预测，并结合大语言模型（LLM）自动生成专业放射学诊断报告。
+胸影智诊 是一套面向医疗机构的全栈 **AI 辅助胸部 X 光影像诊断平台**。系统基于 **DenseNet-121 (CheXNet)** 深度学习模型，支持对 **14 种胸部疾病** 进行多标签概率预测，并结合大语言模型（LLM）自动生成专业放射学诊断报告。
 
 ### 训练数据集
 
@@ -98,13 +108,13 @@
 
 ---
 
-## 版本演进
+## 功能演进
 
-### V2.0 → V3.0 升级总览
+### 功能演进总览
 
 > 从传统单体应用到现代化全栈平台的全面重构
 
-| 升级项 | V2.0 | V3.0 |
+| 升级项 | 早期版本 | 当前版本 |
 |:-------|:-----|:-----|
 | **前端框架** | Vue 2 + Options API | Vue 3 + Composition API + `<script setup>` |
 | **开发语言** | JavaScript | TypeScript (严格类型) |
@@ -1104,8 +1114,8 @@ frontend/
 
 ```bash
 # ===== 第 1 步: 克隆项目 =====
-git clone https://github.com/YLJ109/ChestAI-Diagnosis-V3.0.git
-cd ChestAI-Diagnosis-V3.0
+git clone https://github.com/YLJ109/ChestintelDiagnosis.git
+cd ChestintelDiagnosis
 
 # ===== 第 2 步: 启动后端 =====
 cd backend
@@ -1211,7 +1221,7 @@ server {
 **3. Gunicorn 启动后端**
 
 ```bash
-cd /opt/AIX-RayIntelligentDiagnosisSystemV3.0/backend
+cd /opt/ChestintelDiagnosis/backend
 source venv/bin/activate
 export FLASK_ENV=production
 
@@ -1231,16 +1241,15 @@ gunicorn \
 ```ini
 # /etc/systemd/system/aixray.service
 [Unit]
-Description=AIX-Ray Intelligent Diagnosis System V3.0
-After=network.target
+Description=ChestintelDiagnosis 胸部 X 光 AI 诊断系统 After=network.target
 
 [Service]
 User=www-data
 Group=www-data
-WorkingDirectory=/opt/AIX-RayIntelligentDiagnosisSystemV3.0/backend
+WorkingDirectory=/opt/ChestintelDiagnosis/backend
 Environment=FLASK_ENV=production
-Environment=PATH=/opt/AIX-RayIntelligentDiagnosisSystemV3.0/backend/venv/bin
-ExecStart=/opt/AIX-RayIntelligentDiagnosisSystemV3.0/backend/venv/bin/gunicorn \
+Environment=PATH=/opt/ChestintelDiagnosis/backend/venv/bin
+ExecStart=/opt/ChestintelDiagnosis/backend/venv/bin/gunicorn \
     --bind 127.0.0.1:5000 \
     --worker-class gevent \
     --workers 4 \
@@ -1375,7 +1384,7 @@ docker-compose up -d --build
 
 | 设置键 | 默认值 | 说明 |
 |:-------|:-------|:-----|
-| `system_name` | 胸影智诊V3.0 | 系统显示名称 |
+| `system_name` | 胸影智诊 | 系统显示名称 |
 | `disease_threshold` | 0.7 | 疾病检测告警阈值 |
 | `max_upload_size` | 20 | 最大上传大小 (MB) |
 | `session_timeout` | 12 | 会话超时 (小时) |
@@ -1430,7 +1439,7 @@ docker-compose up -d --build
 1. 查看 **后端控制台日志** — 是否有 Python 异常输出
 2. 确认模型已成功加载（启动日志应显示 `[AI服务] ✅ ONNX 模型加载成功`）
 3. 检查浏览器 F12 Network 面板 — `/batch/progress/:id` 是否有返回数据
-4. 如果是最后一项卡住 — 这是已知竞态条件，V3.0 已修复
+4. 如果是最后一项卡住 — 这是已知竞态条件，当前版本已修复
 
 ### Q4: 报告生成失败或返回 fallback 报告?
 
@@ -1445,7 +1454,7 @@ docker-compose up -d --build
 
 **原因**: SQLite 并发写入冲突（多个请求同时写数据库）。
 
-**解决**: V3.0 已内置自动重试机制，短暂等待后会自动恢复。如频繁出现：
+**解决**: 当前版本已内置自动重试机制，短暂等待后会自动恢复。如频繁出现：
 1. 减少并发请求数
 2. 在 `config.py` 中开启 SQLite WAL 模式
 3. 生产环境建议迁移至 PostgreSQL / MySQL
@@ -1551,7 +1560,7 @@ docker-compose up -d --build
 |:-----|:-----|:-----|
 | **SQLite 并发** | SQLite 不支持高并发写入 | 未来可选 PostgreSQL |
 | **单节点部署** | 当前不支持分布式/集群 | 可通过负载均衡扩展只读 |
-| **DICOM 支持** | 声明了支持但尚未完整实现 | 计划 V3.1 完善 |
+| **DICOM 支持** | 声明了支持但尚未完整实现 | 计划  完善 |
 | **多租户** | 无医院/机构隔离 | 可通过数据标记实现 |
 | **国际化** | 目前仅中文界面 | 可扩展 i18n |
 | **模型更新** | 不支持在线训练/微调 | 需离线训练后替换权重 |
@@ -1569,7 +1578,7 @@ docker-compose up -d --build
 - [x] 渲染优化（影像分析立即显示，AI报告异步生成）
 - [x] 批量诊断优化（三列Grid布局+实时进度）
 - [x] 权限控制增强（患者只能查看自己的数据）
-### V3.0 (已完成)
+### 已实现功能 (已完成)
 
 - [x] 患者门户系统（PC端）
 - [x] 人脸识别登录（1280x720 HD 高清自动识别）
@@ -1588,7 +1597,7 @@ docker-compose up -d --build
 - [x] 批量诊断优化（三列Grid布局+实时进度）
 - [x] 权限控制增强（患者只能查看自己的数据）
 
-### V3.1 (规划中)
+### 近期规划 (规划中)
 
 - [ ] DICOM (.dcm) 文件完整支持
 - [ ] PostgreSQL / MySQL 数据库可选
@@ -1596,13 +1605,13 @@ docker-compose up -d --build
 - [ ] 数据导出 (Excel/CSV)
 - [ ] WebSocket 实时通知 (审批/诊断完成)
 
-### V3.2 (远期)
+### 远期规划 (远期)
 
 - [ ] 多机构/多租户隔离
 - [ ] 移动端响应式适配
 - [ ] 国际化 (i18n) 英文界面
 
-### V4.0 (愿景)
+### 产品愿景 (愿景)
 
 - [ ] 微服务架构拆分
 - [ ] Kubernetes 部署方案
@@ -1615,7 +1624,7 @@ docker-compose up -d --build
 ## 项目结构
 
 ```
-AIX-RayIntelligentDiagnosisSystemV3.0/
+ChestintelDiagnosis/
 │
 ├── backend/                     # Python Flask 后端
 │   ├── api/                     # 17 个 API 蓝图模块（含人脸识别、患者门户）
@@ -1669,11 +1678,11 @@ AIX-RayIntelligentDiagnosisSystemV3.0/
 
 <div align="center">
 
-**胸影智诊 V3.0** — 让 AI 赋能医学影像诊断
+**胸影智诊** — 让 AI 赋能医学影像诊断
 
-🌐 [GitHub](https://github.com/YLJ109/ChestAI-Diagnosis-V3.0) | 📖 [文档](#目录) | 🚀 [快速开始](#快速开始)
+🌐 [GitHub](https://github.com/YLJ109/ChestintelDiagnosis) | 📖 [文档](#目录) | 🚀 [快速开始](#快速开始)
 
-如有问题或建议，欢迎提 [Issue](https://github.com/YLJ109/ChestAI-Diagnosis-V3.0/issues) 或 [Pull Request](https://github.com/YLJ109/ChestAI-Diagnosis-V3.0/pulls)。
+如有问题或建议，欢迎提 [Issue](https://github.com/YLJ109/ChestintelDiagnosis/issues) 或 [Pull Request](https://github.com/YLJ109/ChestintelDiagnosis/pulls)。
 
 ⭐ 如果这个项目对您有帮助，请给个 Star 支持一下！
 

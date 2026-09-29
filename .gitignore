@@ -29,6 +29,8 @@ vite/*
 .vite
 dist
 .venv
+venv/
+backend/venv/
 __pycache__
 .env
 uploads
@@ -36,3 +38,21 @@ model_chestX-ray14_epochs5_81.49_v1.0.pth
 
 ./dataset/output/best_model.onnx
 .lingma
+
+# ===== Python 缓存 / 字节码 =====
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# ===== 运行时数据库 & 本地数据（不入库） =====
+backend/data/
+*.db
+*.sqlite
+*.sqlite3
+
+# ===== WorkBuddy 本地项目记忆（不入库） =====
+.workbuddy/
+
+# ===== 运行时日志 =====
+*.log

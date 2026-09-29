@@ -1,8 +1,10 @@
 """模型权重管理API"""
 import os
+import re
 import hashlib
 import json
 from flask import Blueprint, request, jsonify, current_app
+from werkzeug.utils import secure_filename
 from extensions import db
 from models.model_weight import ModelWeight
 from models.audit import AuditLog
@@ -40,6 +42,9 @@ def upload_weight():
     version_name = request.form.get('version_name', '').strip()
     if not version_name:
         return jsonify({'code': 400, 'message': '版本号不能为空'}), 400
+    # 白名单校验：仅允许字母数字与 . - _，杜绝路径穿越（如 ../../x）
+    if not re.match(r'^[\w.\-]+$', version_name):
+        return jsonify({'code': 400, 'message': '版本号包含非法字符'}), 400
 
     if ModelWeight.query.filter_by(version_name=version_name).first():
         return jsonify({'code': 400, 'message': '版本号已存在'}), 400
@@ -47,7 +52,7 @@ def upload_weight():
     # 保存文件
     model_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'model_files')
     os.makedirs(model_dir, exist_ok=True)
-    filename = f"{version_name}_{file.filename}"
+    filename = f"{secure_filename(version_name)}_{secure_filename(file.filename)}"
     filepath = os.path.join(model_dir, filename)
     file.save(filepath)
 

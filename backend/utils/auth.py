@@ -25,13 +25,8 @@ def generate_token(user_id, role, username):
 def decode_token(token):
     """解码JWT Token"""
     try:
+        # ⚠️ 安全：禁止打印任何密钥片段到日志（避免密钥泄露）
         secret_key = current_app.config['JWT_SECRET_KEY']
-        # ⚠️ 关键修复：只在首次验证时输出密钥信息，避免刷屏
-        if not hasattr(decode_token, '_logged'):
-            print(
-                f'[Token验证] 密钥长度: {len(secret_key)}, 前20字符: {secret_key[:20]}...')
-            decode_token._logged = True
-
         payload = jwt.decode(
             token, secret_key, algorithms=['HS256'])
 

@@ -1,4 +1,8 @@
-# 胸影智诊V3.0 Flask后端依赖
+# 胸影智诊V3.0 Flask后端依赖 (纯 CPU 版本)
+# ⚠️ torch/torchvision 从 CPU 源安装，避免引入 ~2GB 的 CUDA 依赖
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+# ===== Web 框架 =====
 flask>=3.0.0
 flask-restful>=0.3.10
 flask-cors>=4.0.0
@@ -10,25 +14,29 @@ werkzeug>=3.0.0
 python-dotenv>=1.0.0
 sqlalchemy>=2.0.0
 cryptography>=42.0.0
+
+# ===== 图像处理 =====
 pillow>=10.0.0
 opencv-python-headless>=4.9.0
 numpy>=1.24.0
+
+# ===== AI 推理 (CPU) =====
 torch>=2.0.0
 torchvision>=0.15.0
+onnxruntime>=1.19.0          # CPU 版 ONNX Runtime
+
+# ===== 大模型 / 报告 =====
 openai>=1.0.0
 reportlab>=4.0.0
 psutil>=5.9.0
+
+# ===== 服务 =====
 gunicorn>=21.0.0
 gevent>=24.0.0
 
-# ONNX Runtime (GPU加速推理，比PyTorch快2-5倍)
-# GPU版: pip install onnxruntime-gpu
-# CPU版: pip install onnxruntime
-onnxruntime-gpu>=1.19.0  # CUDA 13 支持需要 >= 1.19.0
-
-# 人脸识别（InsightFace - 工业级最强方案）
+# ===== 人脸识别 (InsightFace) =====
 insightface>=0.7.3
+tqdm>=4.66.0
 
-# QR Code 生成与解析
+# ===== 二维码 =====
 qrcode>=7.4.2
-pillow>=10.0.0

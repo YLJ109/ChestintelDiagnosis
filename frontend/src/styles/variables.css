@@ -751,15 +751,6 @@ html.dark .el-select-dropdown,
   min-width: 260px;
 }
 
-/* 筛选栏统一下拉框宽度 */
-.filter-bar .el-select {
-  min-width: 150px;
-}
-
-.filter-bar .el-date-editor {
-  min-width: 260px;
-}
-
 /* 进度条 */
 .el-progress-bar__outer {
   background: var(--bg-tertiary) !important;
@@ -1184,7 +1175,7 @@ html.dark body .el-popper.is-pure .el-dropdown-menu,
 }
 
 .text-green {
-  color: var(--primary) !important;
+  color: var(--green) !important;
 }
 
 .text-purple {

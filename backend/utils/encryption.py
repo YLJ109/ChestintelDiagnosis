@@ -23,11 +23,18 @@ def encrypt_value(plain_text):
 
 
 def decrypt_value(encrypted_text):
-    """解密字符串"""
+    """解密字符串
+
+    返回哨兵字符串 '__DECRYPT_ERROR__' 表示解密失败（密钥不匹配/密文损坏），
+    调用方须显式区分"无密钥"与"解密异常"，避免静默降级导致 AI 报告始终走规则版。
+    """
     if not encrypted_text:
         return ''
     try:
         f = _get_fernet()
         return f.decrypt(encrypted_text.encode()).decode()
-    except Exception:
-        return ''
+    except Exception as e:
+        # 密钥错误或密文损坏：明确告警，返回哨兵而非空串
+        import logging
+        logging.getLogger('encryption').error(f'[加密] LLM 密钥解密失败: {e}')
+        return '__DECRYPT_ERROR__'

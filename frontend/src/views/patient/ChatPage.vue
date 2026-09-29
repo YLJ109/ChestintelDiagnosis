@@ -97,6 +97,7 @@ import { ElMessage } from 'element-plus'
 import { ArrowLeft, ChatDotRound, Promotion } from '@element-plus/icons-vue'
 import { llmApi } from '@/api/llm'
 import { useAuthStore } from '@/stores/auth'
+import { escapeHtml } from '@/utils/xss'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -120,7 +121,8 @@ const quickQuestions = [
 
 // ==================== 工具函数 ====================
 function formatMessage(text: string) {
-    return text
+    const escaped = escapeHtml(text || '')
+    return escaped
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\n/g, '<br>')
         .replace(/^(#{1,3})\s(.+)$/gm, (_m: string, _h: string, t: string) => `<strong>${t}</strong>`)

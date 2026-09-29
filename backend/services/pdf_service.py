@@ -237,15 +237,16 @@ def generate_batch_pdf(batch_no, diagnosis_results, output_dir):
                     pass
 
         # AI报告内容
+        from xml.sax.saxutils import escape as _xml_escape
         report = diag.get('report', {})
         if report:
             elements.append(Paragraph('AI诊断报告', styles['CNHeading']))
             if report.get('findings'):
-                elements.append(Paragraph(f'<b>检查所见：</b>{report["findings"]}', styles['CNBody']))
+                elements.append(Paragraph(f'<b>检查所见：</b>{_xml_escape(str(report["findings"]))}', styles['CNBody']))
             if report.get('impression'):
-                elements.append(Paragraph(f'<b>诊断意见：</b>{report["impression"]}', styles['CNBody']))
+                elements.append(Paragraph(f'<b>诊断意见：</b>{_xml_escape(str(report["impression"]))}', styles['CNBody']))
             if report.get('recommendations'):
-                elements.append(Paragraph(f'<b>建议：</b>{report["recommendations"]}', styles['CNBody']))
+                elements.append(Paragraph(f'<b>建议：</b>{_xml_escape(str(report["recommendations"]))}', styles['CNBody']))
 
         elements.append(Spacer(1, 5*mm))
         elements.append(Paragraph('─' * 60, styles['CNSmall']))

@@ -37,6 +37,7 @@ class FaceRecognitionService:
 
     _instance = None
     _initialized = False
+    _init_lock = threading.Lock()
 
     def __new__(cls):
         if cls._instance is None:
@@ -46,39 +47,43 @@ class FaceRecognitionService:
     def __init__(self):
         if self._initialized:
             return
+        # 加锁双重检查，避免并发首调用重复加载 InsightFace
+        with FaceRecognitionService._init_lock:
+            if self._initialized:
+                return
 
-        # 初始化 InsightFace 模型（优先 GPU，自动降级 CPU）
-        print("[FaceService] 正在加载人脸模型...")
+            # 初始化 InsightFace 模型（优先 GPU，自动降级 CPU）
+            print("[FaceService] 正在加载人脸模型...")
 
-        try:
-            # 尝试使用 GPU，如果不可用会自动降级到 CPU
-            # 使用 buffalo_s 轻量级模型，速度更快
-            self.app = FaceAnalysis(
-                name='buffalo_s',  # 改为轻量级模型
-                providers=['CUDAExecutionProvider', 'CPUExecutionProvider']
-            )
-            # 降低检测尺寸以提速（从 480x480 进一步降到 416x416）
-            self.app.prepare(ctx_id=0, det_size=(416, 416))
+            try:
+                # 尝试使用 GPU，如果不可用会自动降级到 CPU
+                # 使用 buffalo_s 轻量级模型，速度更快
+                self.app = FaceAnalysis(
+                    name='buffalo_s',  # 改为轻量级模型
+                    providers=['CUDAExecutionProvider', 'CPUExecutionProvider']
+                )
+                # 降低检测尺寸以提速（从 480x480 进一步降到 416x416）
+                self.app.prepare(ctx_id=0, det_size=(416, 416))
 
-            # 检测实际使用的设备
-            import onnxruntime as ort
-            available_providers = ort.get_available_providers()
+                # 检测实际使用的设备
+                import onnxruntime as ort
+                available_providers = ort.get_available_providers()
 
-            if 'CUDAExecutionProvider' in available_providers:
-                print("[FaceService] [OK] 推理设备: CUDA GPU (NVIDIA)")
-                print("[FaceService] [FAST] buffalo_s 模型在 GPU 上约 10-30ms/张，极速识别")
-            else:
-                print("[FaceService] [INFO] 推理设备: CPU")
-                print("[FaceService] [INFO] buffalo_s 模型在 CPU 上约 50-100ms/张，快速识别")
+                if 'CUDAExecutionProvider' in available_providers:
+                    print("[FaceService] [OK] 推理设备: CUDA GPU (NVIDIA)")
+                    print("[FaceService] [FAST] buffalo_s 模型在 GPU 上约 10-30ms/张，极速识别")
+                else:
+                    print("[FaceService] [INFO] 推理设备: CPU")
+                    print("[FaceService] [INFO] buffalo_s 模型在 CPU 上约 50-100ms/张，快速识别")
 
-            self._initialized = True
-            print("[FaceService] 人脸模型加载成功")
+                self._initialized = True
+                print("[FaceService] 人脸模型加载成功")
 
-        except Exception as e:
-            print(f"[FaceService] [ERROR] 错误: 人脸模型加载失败: {e}")
-            print("[FaceService] 将使用 CPU 模式")
-            self.app = None
-            self._initialized = True
+            except Exception as e:
+                print(f"[FaceService] [ERROR] 错误: 人脸模型加载失败: {e}")
+                print("[FaceService] 将使用 CPU 模式")
+                self.app = None
+                self._initialized = True
 
     def extract_feature_from_image(self, image_path: str) -> Optional[np.ndarray]:
         """从图片文件提取人脸特征向量

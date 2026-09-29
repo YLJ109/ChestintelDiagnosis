@@ -112,8 +112,10 @@ def delete_user(user_id):
 def reset_password(user_id):
     """重置用户密码"""
     user = User.query.get_or_404(user_id)
-    data = request.get_json()
-    new_password = data.get('new_password', '123456')
+    data = request.get_json(silent=True) or {}
+    new_password = data.get('new_password')
+    if not new_password or len(new_password) < 6:
+        return jsonify({'code': 400, 'message': '新密码不能为空且至少 6 位'}), 400
     user.password_hash = generate_password_hash(new_password)
     db.session.commit()
     _log_audit(request.current_user_id, 'RESET_PASSWORD', 'user', user_id)

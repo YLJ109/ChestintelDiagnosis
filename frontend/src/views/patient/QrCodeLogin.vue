@@ -154,7 +154,7 @@ async function handleLogin() {
   try {
     await authStore.patientLogin(form.patient_no, 'patient_no')
     ElMessage.success('登录成功')
-    router.push('/patient/main')
+    router.push({ name: 'PatientHome' })
   } catch (error: any) {
     ElMessage.error(error.message || '登录失败')
   } finally {
@@ -212,7 +212,7 @@ async function onScanSuccess(decodedText: string) {
     resultDialogVisible.value = true
     
     setTimeout(() => {
-      router.push('/patient/main')
+      router.push({ name: 'PatientHome' })
     }, 1500)
   } catch (error: any) {
     loginSuccess.value = false

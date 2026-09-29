@@ -38,6 +38,9 @@ CN_NAMES = {
 
 NUM_CLASSES = len(CLASS_NAMES)
 
+# 模型加载锁：防止并发请求同时进入 load_model 造成重复加载（TOCTOU）
+_model_lock = threading.Lock()
+
 # 图像预处理（ONNX 和 PyTorch 共用）
 _transform = transforms.Compose([
     transforms.Resize((256, 256)),
@@ -310,71 +313,76 @@ def load_model(model_path=None, version_name=None):
     """加载 AI 模型（优先 ONNX 格式）"""
     global _onnx_session, _use_onnx
 
-    # 查找模型文件
-    if model_path is None:
-        weights_dir = os.path.join(os.path.dirname(
-            os.path.dirname(os.path.abspath(__file__))), 'weights')
-        if os.path.isdir(weights_dir):
-            # 优先找 .onnx 文件
-            for f in sorted(os.listdir(weights_dir)):
-                if f.endswith('.onnx'):
-                    model_path = os.path.join(weights_dir, f)
-                    break
-            # 回退 .pth/.pt
-            if not model_path or not os.path.isfile(model_path):
+    # 加锁并重做双重检查，避免并发重复加载
+    with _model_lock:
+        if is_model_loaded():
+            return True
+
+        # 查找模型文件
+        if model_path is None:
+            weights_dir = os.path.join(os.path.dirname(
+                os.path.dirname(os.path.abspath(__file__))), 'weights')
+            if os.path.isdir(weights_dir):
+                # 优先找 .onnx 文件
                 for f in sorted(os.listdir(weights_dir)):
-                    if f.endswith(('.pth', '.pt')):
+                    if f.endswith('.onnx'):
                         model_path = os.path.join(weights_dir, f)
                         break
-        if not model_path or not os.path.isfile(model_path):
-            base_dir = os.path.dirname(os.path.dirname(
-                os.path.dirname(os.path.abspath(__file__))))
-            model_path = os.path.join(
-                base_dir, 'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth')
+                # 回退 .pth/.pt
+                if not model_path or not os.path.isfile(model_path):
+                    for f in sorted(os.listdir(weights_dir)):
+                        if f.endswith(('.pth', '.pt')):
+                            model_path = os.path.join(weights_dir, f)
+                            break
+            if not model_path or not os.path.isfile(model_path):
+                base_dir = os.path.dirname(os.path.dirname(
+                    os.path.dirname(os.path.abspath(__file__))))
+                model_path = os.path.join(
+                    base_dir, 'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth')
 
-    if not os.path.isfile(model_path):
-        print(f"[AI服务] 警告: 模型文件不存在: {model_path}")
-        return False
+        if not os.path.isfile(model_path):
+            print(f"[AI服务] 警告: 模型文件不存在: {model_path}")
+            return False
 
-    device = get_device()
-    ext = os.path.splitext(model_path)[1].lower()
+        device = get_device()
+        ext = os.path.splitext(model_path)[1].lower()
 
-    # ===== 尝试 ONNX 加载 =====
-    if ext == '.onnx':
-        try:
-            _load_onnx_model(model_path, device)
-            _use_onnx = True
+        # ===== 尝试 ONNX 加载 =====
+        if ext == '.onnx':
+            try:
+                _load_onnx_model(model_path, device)
+                _use_onnx = True
+                _runtime_params['active_weight'] = version_name or os.path.basename(
+                    model_path)
+                print(f"[AI服务] ✅ ONNX 模型加载成功")
+                return True
+            except Exception as e:
+                print(f"[AI服务] ONNX 加载失败: {e}")
+                print(f"[AI服务] 回退到 PyTorch 模式...")
+
+        # ===== PyTorch 模式（回退或直接加载）=====
+        # 如果当前是 .onnx 文件，需要找到对应的 .pth 文件
+        pth_path = model_path
+        if os.path.splitext(model_path)[1].lower() == '.onnx':
+            weights_dir = os.path.dirname(model_path)
+            if os.path.isdir(weights_dir):
+                for f in sorted(os.listdir(weights_dir)):
+                    if f.endswith(('.pth', '.pt')):
+                        pth_path = os.path.join(weights_dir, f)
+                        break
+            if pth_path == model_path:  # 还是 .onnx，说明没有 .pth
+                base_dir = os.path.dirname(os.path.dirname(
+                    os.path.dirname(os.path.abspath(__file__))))
+                pth_path = os.path.join(
+                    base_dir, 'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth')
+            print(f"[AI服务] 使用 PyTorch 权重: {os.path.basename(pth_path)}")
+
+        _use_onnx = False
+        result = _load_pytorch_model_full(pth_path, device)
+        if result:
             _runtime_params['active_weight'] = version_name or os.path.basename(
                 model_path)
-            print(f"[AI服务] ✅ ONNX 模型加载成功")
-            return True
-        except Exception as e:
-            print(f"[AI服务] ONNX 加载失败: {e}")
-            print(f"[AI服务] 回退到 PyTorch 模式...")
-
-    # ===== PyTorch 模式（回退或直接加载）=====
-    # 如果当前是 .onnx 文件，需要找到对应的 .pth 文件
-    pth_path = model_path
-    if os.path.splitext(model_path)[1].lower() == '.onnx':
-        weights_dir = os.path.dirname(model_path)
-        if os.path.isdir(weights_dir):
-            for f in sorted(os.listdir(weights_dir)):
-                if f.endswith(('.pth', '.pt')):
-                    pth_path = os.path.join(weights_dir, f)
-                    break
-        if pth_path == model_path:  # 还是 .onnx，说明没有 .pth
-            base_dir = os.path.dirname(os.path.dirname(
-                os.path.dirname(os.path.abspath(__file__))))
-            pth_path = os.path.join(
-                base_dir, 'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth')
-        print(f"[AI服务] 使用 PyTorch 权重: {os.path.basename(pth_path)}")
-
-    _use_onnx = False
-    result = _load_pytorch_model_full(pth_path, device)
-    if result:
-        _runtime_params['active_weight'] = version_name or os.path.basename(
-            model_path)
-    return result
+        return result
 
 
 def _load_onnx_model(onnx_path, device):
@@ -448,11 +456,16 @@ def _load_pytorch_model_full(pth_path, device):
     """完整加载 PyTorch 模型（作为主引擎时的全量加载）"""
     global _pytorch_model, _grad_cam
 
+    if not os.path.isfile(pth_path):
+        print(f"[AI服务] PyTorch 权重文件不存在: {pth_path}")
+        return False
+
     print(f"[AI服务] 正在加载 PyTorch 模型: {pth_path}")
 
+    # weights_only=True 防止反序列化执行任意代码（CWE-502）
     _pytorch_model = CheXNet(num_classes=NUM_CLASSES,
                              pretrained=False, dropout=0.3)
-    checkpoint = torch.load(pth_path, map_location=device, weights_only=False)
+    checkpoint = torch.load(pth_path, map_location=device, weights_only=True)
 
     state_dict = checkpoint['model_state_dict']
     has_dropout = any('classifier.1.' in k for k in state_dict.keys())

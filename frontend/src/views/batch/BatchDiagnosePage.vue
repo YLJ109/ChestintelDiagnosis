@@ -577,6 +577,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { diagnoseSingleApi } from '@/api/diagnose'
 import { createPatientApi, getPatientsApi } from '@/api/patients'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { escapeHtml } from '@/utils/xss'
 import {
     Upload, Delete, Plus, Loading, CircleCheck, Document, InfoFilled, Warning, Close, User, Search,
     ArrowLeft, ArrowRight
@@ -1076,7 +1077,7 @@ function formatReportToHtml(content: string): string {
             }
 
             // 处理正文内容，高亮重要关键词
-            let highlightedBody = body
+            let highlightedBody = escapeHtml(body)
                 // 高亮疾病名称（如：肺不张、心脏肥大等）
                 .replace(/(肺不张|心脏肥大|胸腔积液|肺浸润|实变|水肿|结节|肿块|气胸|肺炎|肺气肿|纤维化)/g, '<strong class="highlight-disease">$1</strong>')
                 // 高亮CT建议
@@ -1090,7 +1091,7 @@ function formatReportToHtml(content: string): string {
                 <div class="report-section">
                     <div class="${titleClass}">
                         <span class="title-icon">${icon}</span>
-                        <span class="title-text">${title.replace(/[:：]$/, '')}</span>
+                        <span class="title-text">${escapeHtml(title.replace(/[:：]$/, ''))}</span>
                     </div>
                     <div class="report-section-body">${highlightedBody}</div>
                 </div>

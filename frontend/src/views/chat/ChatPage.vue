@@ -178,6 +178,7 @@ import { useAuthStore } from '@/stores/auth'
 import { llmApi } from '@/api/llm'
 import { ElMessage } from 'element-plus'
 import { Close, Delete, Plus, Promotion } from '@element-plus/icons-vue'
+import { escapeHtml } from '@/utils/xss'
 
 const authStore = useAuthStore()
 const consultationStore = useConsultationStore()
@@ -406,7 +407,8 @@ function getCurrentTime() {
 
 // ==================== 消息处理 ====================
 function formatMessage(text: string) {
-  return text
+  const escaped = escapeHtml(text || '')
+  return escaped
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\n/g, '<br>')
     .replace(/^(#{1,3})\s(.+)$/gm, (_m: string, _h: string, t: string) => `<strong>${t}</strong>`)

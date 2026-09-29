@@ -136,6 +136,7 @@ if __name__ == '__main__':
     print("  胸影智诊V3.0 - AI智能辅助诊断系统")
     print("  访问地址: http://localhost:5000")
     print("=" * 50)
-    # debug=True: 开发模式（代码修改自动重启）
-    # debug=False: 生产模式（只启动一次）
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    # debug=True: 开发模式（代码修改自动重启）；生产务必关闭，避免 Werkzeug 调试器 RCE
+    # 由环境变量 FLASK_DEBUG=1 显式开启，默认关闭
+    socketio.run(app, host='0.0.0.0', port=5000,
+                 debug=os.getenv('FLASK_DEBUG', '0') == '1')

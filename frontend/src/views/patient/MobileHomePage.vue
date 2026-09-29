@@ -136,7 +136,7 @@ onMounted(async () => {
             ElMessage.error('登录已过期,请重新登录')
             localStorage.removeItem('token')
             localStorage.removeItem('user')
-            router.push('/patient/mobile-guest')
+            router.push('/patient-login')
         }
     }
 })

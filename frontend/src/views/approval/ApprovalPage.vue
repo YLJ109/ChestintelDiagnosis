@@ -276,6 +276,7 @@ import {
 } from '@/api/approvals'
 import { getReportApi } from '@/api/reports'
 import { getDiagnosisApi } from '@/api/diagnose'
+import { sanitizeHtml } from '@/utils/xss'
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -374,7 +375,7 @@ function formatReport(report: any) {
   const content = report.final_content || report.doctor_edited_content ||
     report.ai_generated_content || report.content || report.report_content ||
     report.text || report.body || (typeof report === 'string' ? report : '') || ''
-  return content.replace(/\n/g, '<br>')
+  return sanitizeHtml(content.replace(/\n/g, '<br>'))
 }
 
 async function loadStats() {
