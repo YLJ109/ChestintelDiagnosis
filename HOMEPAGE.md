@@ -52,15 +52,15 @@
 ## 🖼️ 系统预览
 
 <p align="center">
-  <img src="ProjectImage/医护人员-数据看板.png" alt="数据看板" width="32%"/>
-  <img src="ProjectImage/医护人员-诊断中心.png" alt="诊断中心" width="32%"/>
-  <img src="ProjectImage/医护人员-批量诊断-检测完成.png" alt="批量诊断" width="32%"/>
+  <img src="docs/screenshots/医护人员-数据看板.png" alt="数据看板" width="32%"/>
+  <img src="docs/screenshots/医护人员-诊断中心.png" alt="诊断中心" width="32%"/>
+  <img src="docs/screenshots/医护人员-批量诊断-检测完成.png" alt="批量诊断" width="32%"/>
 </p>
 
 <p align="center">
-  <img src="ProjectImage/医护人员-智能分诊.png" alt="智能分诊" width="32%"/>
-  <img src="ProjectImage/医护人员-AI咨询.png" alt="AI咨询" width="32%"/>
-  <img src="ProjectImage/患者终端-主页.png" alt="患者门户" width="32%"/>
+  <img src="docs/screenshots/医护人员-智能分诊.png" alt="智能分诊" width="32%"/>
+  <img src="docs/screenshots/医护人员-AI咨询.png" alt="AI咨询" width="32%"/>
+  <img src="docs/screenshots/患者终端-主页.png" alt="患者门户" width="32%"/>
 </p>
 
 ---

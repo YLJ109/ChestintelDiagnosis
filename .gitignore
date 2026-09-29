@@ -1,4 +1,30 @@
-# Logs
+# ===== 前端依赖与构建产物 =====
+node_modules
+dist
+dist-ssr
+*.local
+.vite
+vite/*
+
+# ===== Python 运行时 =====
+venv/
+backend/venv/
+.venv
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# ===== 环境与密钥（禁止入库） =====
+.env
+
+# ===== 运行时数据（禁止入库） =====
+uploads
+backend/data/
+backend/model_files/
+*.db
+*.sqlite
+*.sqlite3
 logs
 *.log
 npm-debug.log*
@@ -7,16 +33,12 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# ===== 模型训练产物（本地生成，不入库） =====
+model_chestX-ray14_epochs5_81.49_v1.0.pth
 
-# Editor directories and files
+# ===== 编辑器 / 工具目录 =====
 .vscode/*
 !.vscode/extensions.json
-
-.vscode
 .idea
 .DS_Store
 *.suo
@@ -24,35 +46,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-vite/*
-.vite
-dist
-.venv
-venv/
-backend/venv/
-__pycache__
-.env
-uploads
-model_chestX-ray14_epochs5_81.49_v1.0.pth
-
-./dataset/output/best_model.onnx
 .lingma
 
-# ===== Python 缓存 / 字节码 =====
-__pycache__/
-*.pyc
-*.pyo
-*.egg-info/
-
-# ===== 运行时数据库 & 本地数据（不入库） =====
-backend/data/
-*.db
-*.sqlite
-*.sqlite3
-
-# ===== WorkBuddy 本地项目记忆（不入库） =====
+# ===== WorkBuddy 本地项目记忆 =====
 .workbuddy/
-
-# ===== 运行时日志 =====
-*.log

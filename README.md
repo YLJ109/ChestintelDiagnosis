@@ -15,7 +15,7 @@
 
 [功能特性](#功能特性) · [系统截图](#系统截图) · [快速开始](#快速开始) · [部署指南](#部署指南) · [API 文档](#api-接口文档)
 
-<img src="ProjectImage/医护人员-批量诊断-检测完成.png" alt="批量诊断" width="900"/>
+<img src="docs/screenshots/医护人员-批量诊断-检测完成.png" alt="批量诊断" width="900"/>
 
 </div>
 
@@ -152,7 +152,7 @@
 #### 1. 数据看板
 
 <p align="center">
-  <img src="ProjectImage/医护人员-数据看板.png" alt="数据看板" width="800"/>
+  <img src="docs/screenshots/医护人员-数据看板.png" alt="数据看板" width="800"/>
 </p>
 
 - 诊断统计概览：今日 / 本周 / 本月 / 总计 诊断量趋势
@@ -164,8 +164,8 @@
 #### 2. 诊断中心
 
 <p align="center">
-  <img src="ProjectImage/医护人员-诊断中心.png" alt="诊断中心" width="280"/>
-  <img src="ProjectImage/医护人员-历史诊断.png" alt="检测结果" width="280"/>
+  <img src="docs/screenshots/医护人员-诊断中心.png" alt="诊断中心" width="280"/>
+  <img src="docs/screenshots/医护人员-历史诊断.png" alt="检测结果" width="280"/>
 </p>
 
 - 拖拽或点击上传胸部 X 光影像（PNG / JPG / JPEG）
@@ -188,7 +188,7 @@
 #### 3. 批量诊断
 
 <p align="center">
-  <img src="ProjectImage/医护人员-批量诊断.png" alt="批量诊断" width="800"/>
+  <img src="docs/screenshots/医护人员-批量诊断.png" alt="批量诊断" width="800"/>
 </p>
 
 - 一次选择多张影像，每张独立患者卡片展示
@@ -202,7 +202,7 @@
 #### 4. 智能分诊
 
 <p align="center">
-  <img src="ProjectImage/医护人员-智能分诊.png" alt="智能分诊" width="800"/>
+  <img src="docs/screenshots/医护人员-智能分诊.png" alt="智能分诊" width="800"/>
 </p>
 
 - **15+ 种常见症状**多选：咳嗽 / 胸痛 / 呼吸困难 / 咯血 / 发热 / 咳痰等
@@ -217,7 +217,7 @@
 #### 5. AI 医学咨询
 
 <p align="center">
-  <img src="ProjectImage/医护人员-AI咨询.png" alt="AI咨询" width="800"/>
+  <img src="docs/screenshots/医护人员-AI咨询.png" alt="AI咨询" width="800"/>
 </p>
 
 - **SSE 流式对话** — 实时打字效果，用户体验流畅
@@ -371,17 +371,17 @@
 ### 管理端 (7 大功能模块)
 
 <p align="center">
-  <img src="ProjectImage/后台管理-系统概览.png" alt="系统概览" width="280"/>
-  <img src="ProjectImage/后台管理-用户管理.png" alt="用户管理" width="280"/>
-  <img src="ProjectImage/后台管理-患者管理.png" alt="患者管理" width="280"/>
+  <img src="docs/screenshots/后台管理-系统概览.png" alt="系统概览" width="280"/>
+  <img src="docs/screenshots/后台管理-用户管理.png" alt="用户管理" width="280"/>
+  <img src="docs/screenshots/后台管理-患者管理.png" alt="患者管理" width="280"/>
 </p>
 <p align="center">
-  <img src="ProjectImage/后台管理-权重管理.png" alt="权重管理" width="280"/>
-  <img src="ProjectImage/后台管理-API管理.png" alt="LLM管理" width="280"/>
-  <img src="ProjectImage/后台管理-系统日志.png" alt="审计日志" width="280"/>
+  <img src="docs/screenshots/后台管理-权重管理.png" alt="权重管理" width="280"/>
+  <img src="docs/screenshots/后台管理-API管理.png" alt="LLM管理" width="280"/>
+  <img src="docs/screenshots/后台管理-系统日志.png" alt="审计日志" width="280"/>
 </p>
 <p align="center">
-  <img src="ProjectImage/后台管理-系统设置.png" alt="系统设置" width="500"/>
+  <img src="docs/screenshots/后台管理-系统设置.png" alt="系统设置" width="500"/>
 </p>
 
 | 模块 | 核心功能 |
@@ -416,51 +416,51 @@
 
 | 页面 | 截图 |
 |:-----|:-----|
-| 登录界面 | ![登录](ProjectImage/医护人员-登录界面.png) |
-| 人脸识别登录 | ![人脸识别](ProjectImage/医护人员-登录界面-人脸识别.png) |
-| 识别中 | ![识别中](ProjectImage/医护人员-登录界面-人脸识别中.png) |
+| 登录界面 | ![登录](docs/screenshots/医护人员-登录界面.png) |
+| 人脸识别登录 | ![人脸识别](docs/screenshots/医护人员-登录界面-人脸识别.png) |
+| 识别中 | ![识别中](docs/screenshots/医护人员-登录界面-人脸识别中.png) |
 
 #### 核心功能
 
 | 页面 | 截图 |
 |:-----|:-----|
-| 数据看板 | ![数据看板](ProjectImage/医护人员-数据看板.png) |
-| 诊断中心 | ![诊断中心](ProjectImage/医护人员-诊断中心.png) |
-| 选择患者 | ![选择患者](ProjectImage/医护人员-诊断中心-选择患者.png) |
-| 检测完成 | ![检测完成](ProjectImage/医护人员-诊断中心-检测完成.png) |
-| 批量诊断 | ![批量诊断](ProjectImage/医护人员-批量诊断.png) |
-| 选择患者 (批量) | ![选择患者](ProjectImage/医护人员-批量诊断-选择患者.png) |
-| 检测完成 (批量) | ![检测完成](ProjectImage/医护人员-批量诊断-检测完成.png) |
-| 智能分诊 | ![智能分诊](ProjectImage/医护人员-智能分诊.png) |
-| 选择症状 | ![选择症状](ProjectImage/医护人员-智能分诊-选择症状.png) |
-| 诊断结果 | ![诊断结果](ProjectImage/医护人员-智能分诊-诊断结果.png) |
-| AI 咨询 | ![AI咨询](ProjectImage/医护人员-AI咨询.png) |
-| 历史诊断 | ![历史诊断](ProjectImage/医护人员-历史诊断.png) |
-| 诊断审批 | ![诊断审批](ProjectImage/医护人员-诊断审批.png) |
-| 诊断修正 | ![诊断修正](ProjectImage/医护人员-诊断修正.png) |
+| 数据看板 | ![数据看板](docs/screenshots/医护人员-数据看板.png) |
+| 诊断中心 | ![诊断中心](docs/screenshots/医护人员-诊断中心.png) |
+| 选择患者 | ![选择患者](docs/screenshots/医护人员-诊断中心-选择患者.png) |
+| 检测完成 | ![检测完成](docs/screenshots/医护人员-诊断中心-检测完成.png) |
+| 批量诊断 | ![批量诊断](docs/screenshots/医护人员-批量诊断.png) |
+| 选择患者 (批量) | ![选择患者](docs/screenshots/医护人员-批量诊断-选择患者.png) |
+| 检测完成 (批量) | ![检测完成](docs/screenshots/医护人员-批量诊断-检测完成.png) |
+| 智能分诊 | ![智能分诊](docs/screenshots/医护人员-智能分诊.png) |
+| 选择症状 | ![选择症状](docs/screenshots/医护人员-智能分诊-选择症状.png) |
+| 诊断结果 | ![诊断结果](docs/screenshots/医护人员-智能分诊-诊断结果.png) |
+| AI 咨询 | ![AI咨询](docs/screenshots/医护人员-AI咨询.png) |
+| 历史诊断 | ![历史诊断](docs/screenshots/医护人员-历史诊断.png) |
+| 诊断审批 | ![诊断审批](docs/screenshots/医护人员-诊断审批.png) |
+| 诊断修正 | ![诊断修正](docs/screenshots/医护人员-诊断修正.png) |
 
 ### 患者终端截图
 
 | 页面 | 截图 |
 |:-----|:-----|
-| 登录界面 | ![登录](ProjectImage/患者终端-登陆界面.png) |
-| 主页 | ![主页](ProjectImage/患者终端-主页.png) |
-| 智能分诊 | ![智能分诊](ProjectImage/患者终端-智能分诊.png) |
-| AI 咨询 | ![AI咨询](ProjectImage/患者终端-AI咨询.png) |
-| 打印报告 | ![打印报告](ProjectImage/患者终端-打印报告.png) |
-| 打印界面 | ![打印界面](ProjectImage/患者终端-打印报告界面.png) |
+| 登录界面 | ![登录](docs/screenshots/患者终端-登陆界面.png) |
+| 主页 | ![主页](docs/screenshots/患者终端-主页.png) |
+| 智能分诊 | ![智能分诊](docs/screenshots/患者终端-智能分诊.png) |
+| AI 咨询 | ![AI咨询](docs/screenshots/患者终端-AI咨询.png) |
+| 打印报告 | ![打印报告](docs/screenshots/患者终端-打印报告.png) |
+| 打印界面 | ![打印界面](docs/screenshots/患者终端-打印报告界面.png) |
 
 ### 管理端截图
 
 | 页面 | 截图 |
 |:-----|:-----|
-| 系统概览 | ![系统概览](ProjectImage/后台管理-系统概览.png) |
-| 用户管理 | ![用户管理](ProjectImage/后台管理-用户管理.png) |
-| 患者管理 | ![患者管理](ProjectImage/后台管理-患者管理.png) |
-| 权重管理 | ![权重管理](ProjectImage/后台管理-权重管理.png) |
-| API 管理 | ![API管理](ProjectImage/后台管理-API管理.png) |
-| 系统日志 | ![审计日志](ProjectImage/后台管理-系统日志.png) |
-| 系统设置 | ![系统设置](ProjectImage/后台管理-系统设置.png) |
+| 系统概览 | ![系统概览](docs/screenshots/后台管理-系统概览.png) |
+| 用户管理 | ![用户管理](docs/screenshots/后台管理-用户管理.png) |
+| 患者管理 | ![患者管理](docs/screenshots/后台管理-患者管理.png) |
+| 权重管理 | ![权重管理](docs/screenshots/后台管理-权重管理.png) |
+| API 管理 | ![API管理](docs/screenshots/后台管理-API管理.png) |
+| 系统日志 | ![审计日志](docs/screenshots/后台管理-系统日志.png) |
+| 系统设置 | ![系统设置](docs/screenshots/后台管理-系统设置.png) |
 
 ---
 
@@ -1664,10 +1664,11 @@ ChestintelDiagnosis/
 │   ├── vite.config.ts           # Vite 配置
 │   └── tsconfig.json            # TS 配置
 │
-│   ├── ProjectImage/                # 项目截图 (28 张)
+│   ├── docs/screenshots/                # 项目截图 (30 张)
 │   │   ├── 医护人员-*.png           # (16 张) 登录/诊断/分诊/审批等
 │   │   ├── 患者终端-*.png           # (6 张)  患者门户各功能
 │   │   └── 后台管理-*.png           # (7 张)  管理端各模块
+│   └── docs/samples/                    # 批量诊断示例胸片 (12 张)
 │
 ├── .gitignore                   # Git 忽略规则
 ├── .env                         # 环境变量 (需自行创建)
