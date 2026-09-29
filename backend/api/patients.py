@@ -55,6 +55,7 @@ def get_patients():
 
 @patients_bp.route('/<int:patient_id>', methods=['GET'])
 @token_required
+@role_required('admin', 'doctor', 'nurse')  # B-12: 患者详情仅医护可见
 def get_patient(patient_id):
     """获取患者详情"""
     patient = Patient.query.get_or_404(patient_id)
@@ -63,6 +64,7 @@ def get_patient(patient_id):
 
 @patients_bp.route('/', methods=['POST'])
 @token_required
+@role_required('admin', 'doctor', 'nurse')  # B-12: 建档仅医护可用
 def create_patient():
     """创建患者（支持人脸照片上传）"""
     # 检查是否是表单数据（包含文件）
@@ -140,6 +142,7 @@ def create_patient():
 
 @patients_bp.route('/<int:patient_id>', methods=['PUT'])
 @token_required
+@role_required('admin', 'doctor', 'nurse')  # B-12: 修改患者信息仅医护可用
 def update_patient(patient_id):
     """更新患者信息（支持人脸照片上传）"""
     patient = Patient.query.get_or_404(patient_id)

@@ -1,6 +1,7 @@
 """人脸识别服务 - 基于 InsightFace + ONNX Runtime"""
 import os
 import sys
+import threading
 import numpy as np
 import logging
 from typing import Optional, List, Tuple

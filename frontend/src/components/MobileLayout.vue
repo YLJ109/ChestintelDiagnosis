@@ -179,7 +179,7 @@ defineExpose({
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background: #f5f7fa;
+    background: var(--bg-primary, #f5f7fa); // U-27: 暗黑态跟随主题变量
     overflow: hidden;
 }
 

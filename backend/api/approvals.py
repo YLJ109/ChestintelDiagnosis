@@ -26,7 +26,12 @@ def get_approvals():
     query = Approval.query
 
     if status:
-        query = query.filter_by(status=status)
+        # F-10: 支持"rejected,revision_needed"逗号分隔多状态查询
+        if ',' in status:
+            query = query.filter(Approval.status.in_(
+                [s.strip() for s in status.split(',') if s.strip()]))
+        else:
+            query = query.filter_by(status=status)
     if priority:
         query = query.filter_by(priority=priority)
 
@@ -102,6 +107,7 @@ def get_approvals():
 
 @approvals_bp.route('/<int:approval_id>', methods=['GET'])
 @token_required
+@role_required('admin', 'doctor')  # B-09: 审批详情仅医护可见
 def get_approval(approval_id):
     """获取审批详情"""
     approval = Approval.query.get_or_404(approval_id)
@@ -110,6 +116,7 @@ def get_approval(approval_id):
 
 @approvals_bp.route('/', methods=['POST'])
 @token_required
+@role_required('admin', 'doctor')  # B-09: 提交审批仅医护可用
 def create_approval():
     """提交审批申请"""
     data = request.get_json()
@@ -152,6 +159,7 @@ def create_approval():
 
 @approvals_bp.route('/<int:approval_id>', methods=['PUT'])
 @token_required
+@role_required('admin', 'doctor')  # B-09: 修改审批仅医护可用
 def update_approval(approval_id):
     """更新审批记录（仅pending状态可修改）"""
     approval = Approval.query.get_or_404(approval_id)
@@ -302,6 +310,7 @@ def request_revision(approval_id):
 
 @approvals_bp.route('/stats', methods=['GET'])
 @token_required
+@role_required('admin', 'doctor')  # B-09: 审批统计仅医护可见
 def get_approval_stats():
     """获取审批统计"""
     total = Approval.query.count()

@@ -1,4 +1,5 @@
 """JWT认证工具"""
+import uuid
 import jwt
 from datetime import datetime, timedelta, timezone
 from functools import wraps
@@ -14,6 +15,8 @@ def generate_token(user_id, role, username):
         'user_id': user_id,
         'role': role,
         'username': username,
+        # B-22: 唯一标识，登出时写入黑名单使 Token 立即失效
+        'jti': uuid.uuid4().hex,
         'exp': now + timedelta(seconds=current_app.config['JWT_ACCESS_TOKEN_EXPIRES']),
         'iat': now,
     }
@@ -33,6 +36,13 @@ def decode_token(token):
         # ⚠️ 完全禁用成功日志，避免刷屏
         # if current_app.debug:
         #     print(f'[Token验证] ✅ 成功, user_id={payload.get("user_id")}, role={payload.get("role")}')
+
+        # B-22: 校验 Token 是否已被吊销（登出黑名单）
+        jti = payload.get('jti')
+        if jti:
+            from models.revoked_token import RevokedToken
+            if RevokedToken.query.filter_by(jti=jti).first() is not None:
+                return None
 
         return payload
     except jwt.ExpiredSignatureError:

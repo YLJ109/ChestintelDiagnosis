@@ -52,6 +52,7 @@ def get_pending_reports():
 
 @reports_bp.route('/<int:report_id>', methods=['GET'])
 @token_required
+@role_required('admin', 'doctor')  # B-10: 报告详情仅医护可见（患者走 /patient/report/<id>）
 def get_report(report_id):
     """获取报告详情"""
     report = Report.query.get_or_404(report_id)

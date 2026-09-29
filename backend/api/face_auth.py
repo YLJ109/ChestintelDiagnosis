@@ -9,7 +9,7 @@ from extensions import db
 from models.patient import Patient
 from models.user import User
 from services.face_service import face_service
-from utils.auth import token_required
+from utils.auth import token_required, role_required
 from utils.rate_limiter import rate_limit
 
 face_bp = Blueprint('face', __name__, url_prefix='/api/v1/face')
@@ -459,6 +459,7 @@ def recognize_from_image():
 
 @face_bp.route('/status/<int:patient_id>', methods=['GET'])
 @token_required
+@role_required('admin', 'doctor', 'nurse')  # B-14: 人脸状态查询仅医护可用
 def get_face_status(patient_id):
     """查询患者人脸录入状态
 
@@ -482,6 +483,7 @@ def get_face_status(patient_id):
 
 @face_bp.route('/remove/<int:patient_id>', methods=['DELETE'])
 @token_required
+@role_required('admin', 'doctor')  # B-14: 删除人脸数据仅医护可用
 def remove_face(patient_id):
     """删除患者人脸数据
 
@@ -529,6 +531,14 @@ def enroll_staff_face():
     # 验证用户ID
     user_id = request.form.get('user_id')
     print(f"[FaceAPI-Staff] 收到医护人员人脸录入请求: user_id={user_id}")
+
+    # B-14: 仅管理员或本人可录入医护人脸
+    try:
+        target_uid = int(user_id) if user_id else None
+    except (TypeError, ValueError):
+        target_uid = None
+    if request.current_user_role != 'admin' and request.current_user_id != target_uid:
+        return jsonify({'code': 403, 'message': '仅管理员或本人可录入人脸'}), 403
 
     if not user_id:
         print("[FaceAPI-Staff] 错误: 缺少用户ID")
@@ -713,6 +723,9 @@ def recognize_staff_face():
 @token_required
 def update_staff_face(user_id):
     """更新医护人员人脸（与录入相同逻辑，但会覆盖旧数据）"""
+    # B-14: 仅管理员或本人可更新人脸
+    if request.current_user_role != 'admin' and request.current_user_id != user_id:
+        return jsonify({'code': 403, 'message': '仅管理员或本人可操作'}), 403
     # 验证用户
     user = User.query.get(user_id)
     if not user:
@@ -776,6 +789,7 @@ def update_staff_face(user_id):
 
 @face_bp.route('/remove-staff/<int:user_id>', methods=['DELETE'])
 @token_required
+@role_required('admin')  # B-14: 删除医护人脸仅管理员可用
 def remove_staff_face(user_id):
     """删除医护人员人脸数据"""
     user = User.query.get(user_id)
@@ -805,6 +819,9 @@ def remove_staff_face(user_id):
 @token_required
 def get_staff_face_status(user_id):
     """查询医护人员人脸录入状态"""
+    # B-14: 仅管理员或本人可查询
+    if request.current_user_role != 'admin' and request.current_user_id != user_id:
+        return jsonify({'code': 403, 'message': '仅管理员或本人可查询'}), 403
     user = User.query.get(user_id)
 
     if not user:

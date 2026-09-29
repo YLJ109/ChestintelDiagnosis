@@ -11,10 +11,12 @@ from models.chat import AiChatSession, AiChatMessage
 from models.audit import AuditLog
 from models.settings import SystemSetting, UserPreference, LoginSession
 from models.face_log import FaceRecognitionLog
+from models.revoked_token import RevokedToken
 
 __all__ = [
     'User', 'Patient', 'Diagnosis', 'DiseaseProbability', 'Report',
     'Approval', 'ModelWeight', 'LlmConfig', 'TriageRecord',
     'AiChatSession', 'AiChatMessage', 'AuditLog',
     'SystemSetting', 'UserPreference', 'LoginSession', 'FaceRecognitionLog',
+    'RevokedToken',
 ]

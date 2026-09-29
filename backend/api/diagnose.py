@@ -252,6 +252,7 @@ def get_print_data(diagnosis_id):
 
 @diagnose_bp.route('/<int:diagnosis_id>', methods=['GET'])
 @token_required
+@role_required('admin', 'doctor', 'nurse')  # B-11: 诊断详情仅医护可见
 def get_diagnosis(diagnosis_id):
     """获取诊断详情"""
     diagnosis = Diagnosis.query.get_or_404(diagnosis_id)
@@ -275,6 +276,7 @@ def get_diagnosis(diagnosis_id):
 
 @diagnose_bp.route('/list', methods=['GET'])
 @token_required
+@role_required('admin', 'doctor', 'nurse')  # B-11: 诊断列表仅医护可见
 def get_diagnosis_list():
     """获取诊断记录列表"""
     page = request.args.get('page', 1, type=int)
@@ -334,6 +336,7 @@ def get_diagnosis_list():
 
 @diagnose_bp.route('/<int:diagnosis_id>', methods=['DELETE'])
 @token_required
+@role_required('admin', 'doctor')  # B-11: 删除诊断仅医护可用
 def delete_diagnosis(diagnosis_id):
     """删除诊断记录（级联删除审批和文件）"""
     import os

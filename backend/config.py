@@ -71,4 +71,12 @@ config_map = {
 
 def get_config():
     env = os.getenv('FLASK_ENV', 'development')
-    return config_map.get(env, DevelopmentConfig)
+    config_cls = config_map.get(env, DevelopmentConfig)
+    # B-07: 生产环境强制拒绝默认密钥
+    if env == 'production':
+        insecure = [k for k in ('SECRET_KEY', 'JWT_SECRET_KEY', 'LLM_ENCRYPTION_KEY')
+                    if getattr(config_cls, k, '').startswith('aixray-')]
+        if insecure:
+            raise RuntimeError(
+                f'生产环境禁止使用默认密钥，请通过环境变量/\.env 设置: {", ".join(insecure)}')
+    return config_cls

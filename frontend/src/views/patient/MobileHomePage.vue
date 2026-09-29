@@ -12,8 +12,8 @@
                     </el-icon>
                 </div>
                 <div class="welcome-text">
-                    <h2 class="greeting">您好,{{ patientName }}</h2>
-                    <p class="patient-no">患者编号: {{ patientNo }}</p>
+                    <h2 class="greeting">您好,{{ patientName || '患者' }}</h2>
+                    <p class="patient-no" v-if="patientNo">患者编号: {{ patientNo }}</p>
                 </div>
             </div>
         </div>
@@ -78,15 +78,15 @@ import { requestPermission, getPermissionStatus } from '@/utils/notification'
 
 const router = useRouter()
 
-// 患者信息
-const patientName = ref('张伟')
-const patientNo = ref('P20260315001')
+// 患者信息（F-11: 移除伪造演示数据，默认空值，由真实接口填充）
+const patientName = ref('')
+const patientNo = ref('')
 
-// 统计数据
+// 统计数据（F-11: 默认 0，不做假数据兜底）
 const stats = ref([
-    { label: '诊断次数', value: 12, icon: markRaw(FirstAidKit), color: 'linear-gradient(135deg, #0EA5E9, #06B6D4)' },
-    { label: '报告数量', value: 8, icon: markRaw(Document), color: 'linear-gradient(135deg, #10B981, #059669)' },
-    { label: '就诊记录', value: 15, icon: markRaw(Clock), color: 'linear-gradient(135deg, #F59E0B, #D97706)' },
+    { label: '诊断次数', value: 0, icon: markRaw(FirstAidKit), color: 'linear-gradient(135deg, #0EA5E9, #06B6D4)' },
+    { label: '报告数量', value: 0, icon: markRaw(Document), color: 'linear-gradient(135deg, #10B981, #059669)' },
+    { label: '就诊记录', value: 0, icon: markRaw(Clock), color: 'linear-gradient(135deg, #F59E0B, #D97706)' },
 ])
 
 // 功能模块
@@ -110,11 +110,14 @@ onMounted(async () => {
     try {
         const res: any = await getPatientDashboardApi()
         if (res.data) {
-            patientName.value = res.data.patient_name || patientName.value
-            patientNo.value = res.data.patient_no || patientNo.value
-            stats.value[0].value = res.data.diagnosis_count || 0
-            stats.value[1].value = res.data.report_count || 0
-            stats.value[2].value = res.data.visit_count || 0
+            // F-11: 按后端 /patient/dashboard 真实返回结构取值
+            const patient = res.data.patient || {}
+            const statData = res.data.stats || {}
+            patientName.value = patient.name || ''
+            patientNo.value = patient.patient_no || ''
+            stats.value[0].value = statData.total_diagnoses ?? 0
+            stats.value[1].value = statData.reviewed_reports ?? 0
+            stats.value[2].value = statData.triage_count ?? 0
         }
 
         // 请求通知权限

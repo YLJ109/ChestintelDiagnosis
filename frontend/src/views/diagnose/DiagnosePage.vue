@@ -919,6 +919,7 @@ onUnmounted(() => {
   .report-zone {
     // margin-bottom: 20px;
     max-height: 760px;
+    overflow-y: auto; // U-25: 内容超出时内部滚动，避免溢出不可见
   }
 
   // ========== 患者挂号区 ==========

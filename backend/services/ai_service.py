@@ -515,6 +515,35 @@ def _load_pytorch_model_full(pth_path, device):
 # ============================================================
 # 核心推理函数
 # ============================================================
+# S-05: 预处理结果缓存 —— 同一文件（路径+mtime+大小指纹）重复诊断时跳过 decode/resize
+_preproc_cache = {}
+_preproc_cache_lock = threading.Lock()
+_PREPROC_CACHE_MAX = 32
+
+
+def _preprocess_image_cached(image_path):
+    try:
+        st = os.stat(image_path)
+        key = (image_path, st.st_mtime, st.st_size)
+    except OSError:
+        key = None
+
+    if key is not None:
+        with _preproc_cache_lock:
+            hit = _preproc_cache.get(key)
+        if hit is not None:
+            return hit
+
+    result = _preprocess_image(image_path)
+
+    if key is not None:
+        with _preproc_cache_lock:
+            if len(_preproc_cache) >= _PREPROC_CACHE_MAX:
+                _preproc_cache.pop(next(iter(_preproc_cache)))
+            _preproc_cache[key] = result
+    return result
+
+
 def _preprocess_image(image_path):
     """图像预处理（可在线程池中并行执行）"""
     import os
@@ -588,8 +617,8 @@ def predict_image(image_path, target_disease=None, skip_heatmap=False):
     Returns:
         dict: probabilities + heatmap_image
     """
-    # 预处理
-    np_arr, image_pil = _preprocess_image(image_path)
+    # 预处理（S-05: 命中缓存时跳过 decode/resize）
+    np_arr, image_pil = _preprocess_image_cached(image_path)
     np_batch = np_arr[np.newaxis, ...]                     # (1, 3, 224, 224)
 
     # 推理
@@ -675,7 +704,7 @@ def predict_images_batch(image_paths, skip_heatmap=True, cancel_check=None):
                 return None  # 返回None表示被取消
 
             print(f"[AI服务] 🔄 处理第 [{idx+1}/{n}] 张...")
-            result = _preprocess_image(path)
+            result = _preprocess_image_cached(path)
             preprocess_results.append(result)
 
         print(f"[AI服务] ✅ 全部预处理完成 {len(preprocess_results)} 张图片")

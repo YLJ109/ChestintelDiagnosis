@@ -59,6 +59,8 @@
   /* 中灰 */
   --text-muted: #9CA3AF;
   /* 浅灰 */
+  --text-placeholder: #9CA3AF;
+  /* U-05: 输入框占位符（补齐未定义变量） */
 
   /* ===== 卡片 - 纯白底色+柔和弥散投影 ===== */
   --card-bg: #FFFFFF;
@@ -193,6 +195,8 @@ html.dark,
   /* 浅灰 */
   --text-muted: #9CA3AF;
   /* 中灰 */
+  --text-placeholder: #6B7280;
+  /* U-05: 暗黑态占位符（补齐未定义变量） */
 
   /* ===== 卡片 - 深色背景+微弱边框 ===== */
   --card-bg: #1E293B;

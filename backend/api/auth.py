@@ -2,7 +2,7 @@
 import os
 import io
 import base64
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Blueprint, request, jsonify, send_file
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db
@@ -422,7 +422,26 @@ def change_password():
 @auth_bp.route('/logout', methods=['POST'])
 @token_required
 def logout():
-    """用户登出"""
+    """用户登出（B-22: 将当前 Token 写入黑名单，立即失效）"""
+    auth_header = request.headers.get('Authorization', '')
+    token = auth_header.split(' ', 1)[1] if auth_header.startswith('Bearer ') else None
+    if token:
+        from utils.auth import decode_token
+        from models.revoked_token import RevokedToken
+        payload = decode_token(token)
+        if payload and payload.get('jti'):
+            try:
+                expires_at = datetime.fromtimestamp(
+                    payload['exp'], tz=timezone.utc
+                ).replace(tzinfo=None) if payload.get('exp') else None
+                db.session.add(RevokedToken(
+                    jti=payload['jti'],
+                    user_id=request.current_user_id,
+                    expires_at=expires_at,
+                ))
+                db.session.commit()
+            except Exception:
+                db.session.rollback()  # 黑名单写入失败不阻断登出
     _log_audit(request.current_user_id, request.current_user.username,
                'LOGOUT', None, None, request.remote_addr)
     return jsonify({'code': 200, 'message': '已登出'})

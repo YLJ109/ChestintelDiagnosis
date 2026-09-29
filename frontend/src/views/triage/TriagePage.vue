@@ -307,7 +307,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onUnmounted } from 'vue'
 import { llmApi } from '@/api/llm'
 import { ElMessage } from 'element-plus'
 import { Close } from '@element-plus/icons-vue'
@@ -428,6 +428,10 @@ async function handleTriage() {
   }
   analyzing.value = true
 
+  // F-09: 取消上一次未完成的分诊请求，避免竞态
+  analyzeAbort?.abort()
+  analyzeAbort = new AbortController()
+
   const symptomDescriptions = form.symptoms.map(id => {
     const opt = getSymptomById(id)
     const detail = form.symptomDetails[id] || {}
@@ -475,7 +479,7 @@ ${form.medical_history || '无'}
       ],
       temperature: 0.3,
       max_tokens: 2000
-    })
+    }, { signal: analyzeAbort.signal })
 
     // 检查API是否成功
     if (!res.success && res.error) {
@@ -499,7 +503,8 @@ ${form.medical_history || '无'}
         }
         const diseaseColors = ['#EF4444', '#F59E0B', '#3B82F6', '#8B5CF6', '#22D3EE']
         triageResult.value = {
-          riskScore: parsed.riskScore,
+          // F-09: riskScore 钳制到 0-100，防止 AI 越界值打爆进度条
+          riskScore: Math.min(100, Math.max(0, Number(parsed.riskScore) || 0)),
           riskLevel: parsed.riskLevel,
           riskColor: riskColorMap[parsed.riskLevel]?.color || '#F59E0B',
           riskBgColor: riskColorMap[parsed.riskLevel]?.bg || 'rgba(245, 158, 11, 0.2)',
@@ -516,8 +521,16 @@ ${form.medical_history || '无'}
       console.warn('分诊原始内容(无JSON):', aiContent.substring(0, 200))
       ElMessage.error('AI未返回有效数据，请重试')
     }
-  } catch { ElMessage.error('智能分诊调用失败，请重试') } finally { analyzing.value = false }
+  } catch (err: any) {
+    // F-09: 用户取消/新请求替换旧请求时静默处理
+    if (err?.name === 'CanceledError' || err?.name === 'AbortError' || err?.code === 'ERR_CANCELED') return
+    ElMessage.error('智能分诊调用失败，请重试')
+  } finally { analyzing.value = false }
 }
+
+// F-09: 离开页面时取消进行中的请求
+let analyzeAbort: AbortController | null = null
+onUnmounted(() => { analyzeAbort?.abort() })
 
 function getAdviceIcon(title: string) {
   if (title.includes('科室')) return '🏥'

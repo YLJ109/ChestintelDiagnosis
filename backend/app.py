@@ -36,7 +36,21 @@ def create_app():
 
     # 初始化扩展
     db.init_app(app)
-    cors.init_app(app, resources={r"/*": {"origins": "*"}})
+
+    # B-30: CORS 白名单 —— 优先取 CORS_ORIGINS 环境变量（逗号分隔）；
+    # 未配置时默认放行本机与局域网私有网段（方便移动端联调），生产环境务必显式配置
+    cors_origins_env = os.getenv('CORS_ORIGINS', '')
+    if cors_origins_env:
+        cors_origins = [o.strip() for o in cors_origins.split(',') if o.strip()]
+    else:
+        cors_origins = [
+            r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+            r"^https?://192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$",
+            r"^https?://10\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$",
+            r"^https?://172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}(:\d+)?$",
+        ]
+    cors.init_app(app, resources={r"/*": {"origins": cors_origins}})
+
     socketio.init_app(app)
     limiter.init_app(app)
 
@@ -118,8 +132,19 @@ def create_app():
             'type': type(e).__name__
         }, 500
 
-    # 应用启动后加载AI模型
+    # S-03: 请求上下文异常时回滚未提交事务，避免脏数据残留
+    @app.teardown_appcontext
+    def rollback_on_error(exc=None):
+        if exc is not None:
+            try:
+                db.session.rollback()
+            except Exception:
+                pass
+
+    # 应用启动后初始化数据库表并加载AI模型
     with app.app_context():
+        # 幂等建表（含新增的 revoked_tokens 黑名单表）
+        db.create_all()
         from services.ai_service import load_model
         try:
             load_model()

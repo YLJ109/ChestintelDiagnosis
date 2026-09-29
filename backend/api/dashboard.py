@@ -13,6 +13,7 @@ dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/api/v1/dashboard')
 
 @dashboard_bp.route('/stats', methods=['GET'])
 @token_required
+@role_required('admin', 'doctor', 'nurse')  # B-13: 仪表盘仅医护可见
 def get_stats():
     """获取看板统计数据"""
     today = datetime.now().date()
@@ -62,6 +63,7 @@ def get_stats():
 
 @dashboard_bp.route('/disease-distribution', methods=['GET'])
 @token_required
+@role_required('admin', 'doctor', 'nurse')  # B-13: 仪表盘仅医护可见
 def get_disease_distribution():
     """获取疾病分布数据（近30天）"""
     thirty_days_ago = datetime.now() - timedelta(days=30)
@@ -89,6 +91,7 @@ def get_disease_distribution():
 
 @dashboard_bp.route('/trend', methods=['GET'])
 @token_required
+@role_required('admin', 'doctor', 'nurse')  # B-13: 仪表盘仅医护可见
 def get_diagnosis_trend():
     """获取诊断趋势数据（近30天每日诊断量）"""
     thirty_days_ago = datetime.now() - timedelta(days=30)

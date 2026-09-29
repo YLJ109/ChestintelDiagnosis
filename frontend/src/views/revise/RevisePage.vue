@@ -271,26 +271,9 @@ async function fetchList() {
         }
         if (filters.keyword) params.keyword = filters.keyword
 
-        let targetStatus = filters.status
-        if (!targetStatus) {
-            // 默认显示“全部”（已退回 + 需修正）
-            // 由于后端不支持多状态查询，我们分别查询后合并
-            const perPage = 100 // 获取足够多的数据
-            const [resRejected, resRevision] = await Promise.all([
-                http.get('/approvals/', { params: { ...params, status: 'rejected', per_page: perPage } }),
-                http.get('/approvals/', { params: { ...params, status: 'revision_needed', per_page: perPage } }),
-            ])
+        // F-10: "全部" = 已退回 + 需修正，走后端多状态查询，保持标准分页
+        params.status = filters.status || 'rejected,revision_needed'
 
-            // http拦截器已返回data，直接使用
-            const items1 = resRejected.data?.items || []
-            const items2 = resRevision.data?.items || []
-            tableData.value = [...items1, ...items2]
-            pagination.total = items1.length + items2.length
-            loading.value = false
-            return
-        }
-
-        params.status = targetStatus
         const res: any = await http.get('/approvals/', { params })
         if (res.code === 200) {
             tableData.value = res.data.items || []

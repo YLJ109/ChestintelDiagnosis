@@ -4,6 +4,7 @@
 基于IP地址和接口的速率限制
 """
 import time
+import threading
 from functools import wraps
 from flask import request, jsonify
 from collections import defaultdict
@@ -15,6 +16,8 @@ class RateLimiter:
     def __init__(self):
         # 存储结构: {ip: {endpoint: [(timestamp, ...)]}}
         self.requests = defaultdict(lambda: defaultdict(list))
+        # B-29: SocketIO 多线程环境下保护计数结构
+        self._lock = threading.Lock()
 
         # 默认限流配置
         self.default_limits = {
@@ -49,23 +52,24 @@ class RateLimiter:
         now = time.time()
         window_start = now - window
 
-        # 清理过期记录
-        self.requests[ip][endpoint] = [
-            ts for ts in self.requests[ip][endpoint]
-            if ts > window_start
-        ]
+        with self._lock:
+            # 清理过期记录
+            self.requests[ip][endpoint] = [
+                ts for ts in self.requests[ip][endpoint]
+                if ts > window_start
+            ]
 
-        current_count = len(self.requests[ip][endpoint])
+            current_count = len(self.requests[ip][endpoint])
 
-        if current_count >= max_requests:
-            # 已超限
-            oldest_request = min(self.requests[ip][endpoint])
-            reset_time = int(oldest_request + window - now) + 1
-            return True, 0, reset_time
+            if current_count >= max_requests:
+                # 已超限
+                oldest_request = min(self.requests[ip][endpoint])
+                reset_time = int(oldest_request + window - now) + 1
+                return True, 0, reset_time
 
-        # 记录本次请求
-        self.requests[ip][endpoint].append(now)
-        remaining = max_requests - current_count - 1
+            # 记录本次请求
+            self.requests[ip][endpoint].append(now)
+            remaining = max_requests - current_count - 1
 
         return False, remaining, window
 
@@ -76,25 +80,26 @@ class RateLimiter:
                          for config in self.default_limits.values())
         cutoff = now - max_window
 
-        ips_to_remove = []
-        for ip in self.requests:
-            endpoints_to_remove = []
-            for endpoint in self.requests[ip]:
-                self.requests[ip][endpoint] = [
-                    ts for ts in self.requests[ip][endpoint]
-                    if ts > cutoff
-                ]
-                if not self.requests[ip][endpoint]:
-                    endpoints_to_remove.append(endpoint)
+        with self._lock:
+            ips_to_remove = []
+            for ip in self.requests:
+                endpoints_to_remove = []
+                for endpoint in self.requests[ip]:
+                    self.requests[ip][endpoint] = [
+                        ts for ts in self.requests[ip][endpoint]
+                        if ts > cutoff
+                    ]
+                    if not self.requests[ip][endpoint]:
+                        endpoints_to_remove.append(endpoint)
 
-            for endpoint in endpoints_to_remove:
-                del self.requests[ip][endpoint]
+                for endpoint in endpoints_to_remove:
+                    del self.requests[ip][endpoint]
 
-            if not self.requests[ip]:
-                ips_to_remove.append(ip)
+                if not self.requests[ip]:
+                    ips_to_remove.append(ip)
 
-        for ip in ips_to_remove:
-            del self.requests[ip]
+            for ip in ips_to_remove:
+                del self.requests[ip]
 
 
 # 创建全局实例

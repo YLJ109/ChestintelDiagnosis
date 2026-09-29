@@ -5,7 +5,7 @@ from extensions import db
 from models.triage import TriageRecord
 from models.patient import Patient
 from models.audit import AuditLog
-from utils.auth import token_required
+from utils.auth import token_required, role_required
 from services.llm_service import triage_analyze
 
 triage_bp = Blueprint('triage', __name__, url_prefix='/api/v1/triage')
@@ -24,6 +24,10 @@ def analyze():
 
     if not symptoms:
         return jsonify({'code': 400, 'message': '请提供症状信息'}), 400
+
+    # B-15: 患者角色只能为自己分诊，忽略请求体中的 patient_id
+    if request.current_user_role == 'patient':
+        patient_id = request.current_user_id
 
     # AI分诊
     result = triage_analyze(symptoms, severity, vital_signs)
@@ -56,7 +60,12 @@ def get_triage_records():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
 
-    query = TriageRecord.query.order_by(TriageRecord.created_at.desc())
+    query = TriageRecord.query
+    # B-15: 患者只能查看自己的分诊记录
+    if request.current_user_role == 'patient':
+        query = query.filter_by(patient_id=request.current_user_id)
+
+    query = query.order_by(TriageRecord.created_at.desc())
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 
     return jsonify({
@@ -72,6 +81,7 @@ def get_triage_records():
 
 @triage_bp.route('/<int:record_id>/confirm', methods=['POST'])
 @token_required
+@role_required('admin', 'doctor')  # B-15: 确认分诊仅医生可用
 def confirm_triage(record_id):
     """医生确认分诊结果"""
     record = TriageRecord.query.get_or_404(record_id)

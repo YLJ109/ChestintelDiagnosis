@@ -88,13 +88,11 @@ const handleLogout = () => {
     router.push('/patient-login')
 }
 
-// 初始化主题 - 强制使用浅色主题
+// 初始化主题 - U-02: 跟随用户设置，不再强制浅色
 onMounted(() => {
-    // 设置为浅色主题
-    document.documentElement.setAttribute('data-theme', 'light')
-    document.documentElement.classList.remove('dark')
-    document.documentElement.classList.add('light')
-    // 注意：不再清除 localStorage 中的 theme 设置，避免影响其他模块
+    document.documentElement.setAttribute('data-theme', authStore.theme || 'light')
+    document.documentElement.classList.remove('dark', 'light')
+    document.documentElement.classList.add(authStore.theme || 'light')
 })
 </script>
 
