@@ -338,7 +338,7 @@ def load_model(model_path=None, version_name=None):
                 base_dir = os.path.dirname(os.path.dirname(
                     os.path.dirname(os.path.abspath(__file__))))
                 model_path = os.path.join(
-                    base_dir, 'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth')
+                    base_dir, 'docs', 'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth')
 
         if not os.path.isfile(model_path):
             print(f"[AI服务] 警告: 模型文件不存在: {model_path}")
@@ -374,7 +374,7 @@ def load_model(model_path=None, version_name=None):
                 base_dir = os.path.dirname(os.path.dirname(
                     os.path.dirname(os.path.abspath(__file__))))
                 pth_path = os.path.join(
-                    base_dir, 'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth')
+                    base_dir, 'docs', 'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth')
             print(f"[AI服务] 使用 PyTorch 权重: {os.path.basename(pth_path)}")
 
         _use_onnx = False
@@ -774,7 +774,7 @@ def _find_pth_path():
                 return os.path.join(weights_dir, f)
     base_dir = os.path.dirname(os.path.dirname(
         os.path.dirname(os.path.abspath(__file__))))
-    return os.path.join(base_dir, 'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth')
+    return os.path.join(base_dir, 'docs', 'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth')
 
 
 def is_model_loaded():

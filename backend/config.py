@@ -29,7 +29,7 @@ class Config:
     MODEL_WEIGHTS_DIR = os.path.join(BASE_DIR, 'model_files')
     DEFAULT_MODEL_PATH = os.path.join(
         os.path.dirname(BASE_DIR),
-        'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth'
+        'docs', 'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth'
     )
 
     # LLM配置

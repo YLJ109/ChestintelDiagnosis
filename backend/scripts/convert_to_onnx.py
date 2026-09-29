@@ -136,7 +136,7 @@ def main():
     if not pth_path or not os.path.isfile(pth_path):
         # 回退到默认位置
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        pth_path = os.path.join(base_dir, 'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth')
+        pth_path = os.path.join(base_dir, 'docs', 'ChestX-ray14', 'output', 'model_chestX-ray14_epochs5_81.49_v1.0.pth')
 
     if not os.path.isfile(pth_path):
         print(f"错误: 找不到模型文件: {pth_path}")
