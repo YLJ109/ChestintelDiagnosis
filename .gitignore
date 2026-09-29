@@ -50,3 +50,6 @@ model_chestX-ray14_epochs5_81.49_v1.0.pth
 
 # ===== WorkBuddy 本地项目记忆 =====
 .workbuddy/
+
+# ===== 本地材料（不入库） =====
+答辩材料.md
